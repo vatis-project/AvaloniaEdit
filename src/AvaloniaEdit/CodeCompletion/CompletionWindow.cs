@@ -45,7 +45,10 @@ namespace AvaloniaEdit.CodeCompletion
         /// </summary>
         public CompletionWindow(TextArea textArea) : base(textArea)
         {
-            CompletionList = new CompletionList();
+            CompletionList = new CompletionList
+            {
+                CompletionAcceptAction = textArea.Options.CompletionAcceptAction
+            };
             // keep height automatic
             CloseAutomatically = true;
             MaxHeight = 225;
@@ -59,7 +62,7 @@ namespace AvaloniaEdit.CodeCompletion
 
             _toolTip = new PopupWithCustomPosition
             {
-                IsLightDismissEnabled = true,
+                IsLightDismissEnabled = false,
                 PlacementTarget = this,
                 Child = _toolTipContent,
             };

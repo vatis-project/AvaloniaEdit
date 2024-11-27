@@ -92,8 +92,6 @@
                         Grid.Row="0">
               <TextBox Watermark="{x:Static ae:SR.SearchLabel}"
                        Name="PART_searchTextBox"
-                       Grid.Column="1"
-                       Grid.Row="0"
                        Width="265"
                        Margin="0,0,0,0"
                        Text="{Binding SearchPattern, RelativeSource={RelativeSource TemplatedParent}}">
@@ -108,8 +106,8 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Width="12"
-                            Fill="{Binding $parent.Foreground}"
-                            Stroke="{Binding $parent.Foreground}"
+                            Fill="{Binding $parent[ToggleButton].Foreground}"
+                            Stroke="{Binding $parent[ToggleButton].Foreground}"
                             StrokeThickness="1" />
                     </ToggleButton>
                     <ToggleButton Theme="{StaticResource SearchPanelTextBoxButton}"
@@ -122,8 +120,8 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Width="14"
-                            Fill="{Binding $parent.Foreground}"
-                            Stroke="{Binding $parent.Foreground}"
+                            Fill="{Binding $parent[ToggleButton].Foreground}"
+                            Stroke="{Binding $parent[ToggleButton].Foreground}"
                             StrokeThickness="1" />
                     </ToggleButton>
                     <ToggleButton Theme="{StaticResource SearchPanelTextBoxButton}"
@@ -136,8 +134,8 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Width="12"
-                            Fill="{Binding $parent.Foreground}"
-                            Stroke="{Binding $parent.Foreground}"
+                            Fill="{Binding $parent[ToggleButton].Foreground}"
+                            Stroke="{Binding $parent[ToggleButton].Foreground}"
                             StrokeThickness="1" />
                     </ToggleButton>
                   </StackPanel>
@@ -155,8 +153,8 @@
                       HorizontalAlignment="Center"
                       VerticalAlignment="Center"
                       Width="16"
-                      Fill="{Binding $parent.Foreground}"
-                      Stroke="{Binding $parent.Foreground}"
+                      Fill="{Binding $parent[Button].Foreground}"
+                      Stroke="{Binding $parent[Button].Foreground}"
                       StrokeThickness="1" />
               </Button>
               <Button Margin="3,0,0,0"
@@ -171,8 +169,8 @@
                       VerticalAlignment="Center"
                       Stretch="Uniform"
                       Width="16"
-                      Fill="{Binding $parent.Foreground}"
-                      Stroke="{Binding $parent.Foreground}"
+                      Fill="{Binding $parent[Button].Foreground}"
+                      Stroke="{Binding $parent[Button].Foreground}"
                       StrokeThickness="1" />
               </Button>
               <Button Margin="3,0,0,0"
@@ -185,8 +183,8 @@
                       VerticalAlignment="Center"
                       Stretch="Uniform"
                       Width="12"
-                      Fill="{Binding $parent.Foreground}"
-                      Stroke="{Binding $parent.Foreground}"
+                      Fill="{Binding $parent[Button].Foreground}"
+                      Stroke="{Binding $parent[Button].Foreground}"
                       StrokeThickness="1" />
               </Button>
             </StackPanel>
@@ -198,8 +196,6 @@
                         Grid.Row="1">
               <TextBox Name="ReplaceBox" Watermark="{x:Static ae:SR.ReplaceLabel}"
                        IsVisible="{Binding IsReplaceMode, RelativeSource={RelativeSource TemplatedParent}}"
-                       Grid.Column="1"
-                       Grid.Row="1"
                        Width="265"
                        Margin="0 0 0 0"
                        Text="{Binding ReplacePattern, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -215,7 +211,7 @@
                       VerticalAlignment="Center"
                       Stretch="Uniform"
                       Width="12"
-                      Fill="{Binding $parent.Foreground}"
+                      Fill="{Binding $parent[Button].Foreground}"
                       StrokeThickness="1" />
               </Button>
               <Button Margin="3, 0, 0, 0"
@@ -230,7 +226,7 @@
                       VerticalAlignment="Center"
                       Stretch="Uniform"
                       Width="18"
-                      Fill="{Binding $parent.Foreground}" />
+                      Fill="{Binding $parent[Button].Foreground}" />
               </Button>
             </StackPanel>
             <StackPanel Name="PART_MessageView"

@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2014 AlphaSierraPapa for the SharpDevelop Team
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this
 // software and associated documentation files (the "Software"), to deal in the Software
 // without restriction, including without limitation the rights to use, copy, modify, merge,
 // publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
 // to whom the Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 // INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 // PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
@@ -62,7 +62,7 @@ namespace AvaloniaEdit.Editing
         }
 
         static EditingCommandHandler()
-        {            
+        {
             AddBinding(EditingCommands.Delete, KeyModifiers.None, Key.Delete, OnDelete(CaretMovementType.CharRight));
             AddBinding(EditingCommands.DeleteNextWord, KeyModifiers.Control, Key.Delete,
                 OnDelete(CaretMovementType.WordRight));
@@ -79,21 +79,6 @@ namespace AvaloniaEdit.Editing
             AddBinding(ApplicationCommands.Copy, OnCopy, CanCopy);
             AddBinding(ApplicationCommands.Cut, OnCut, CanCut);
             AddBinding(ApplicationCommands.Paste, OnPaste, CanPaste);
-
-            AddBinding(AvaloniaEditCommands.ToggleOverstrike, OnToggleOverstrike);
-            AddBinding(AvaloniaEditCommands.DeleteLine, OnDeleteLine);
-
-            AddBinding(AvaloniaEditCommands.RemoveLeadingWhitespace, OnRemoveLeadingWhitespace);
-            AddBinding(AvaloniaEditCommands.RemoveTrailingWhitespace, OnRemoveTrailingWhitespace);
-            AddBinding(AvaloniaEditCommands.ConvertToUppercase, OnConvertToUpperCase);
-            AddBinding(AvaloniaEditCommands.ConvertToLowercase, OnConvertToLowerCase);
-            AddBinding(AvaloniaEditCommands.ConvertToTitleCase, OnConvertToTitleCase);
-            AddBinding(AvaloniaEditCommands.InvertCase, OnInvertCase);
-            AddBinding(AvaloniaEditCommands.ConvertTabsToSpaces, OnConvertTabsToSpaces);
-            AddBinding(AvaloniaEditCommands.ConvertSpacesToTabs, OnConvertSpacesToTabs);
-            AddBinding(AvaloniaEditCommands.ConvertLeadingTabsToSpaces, OnConvertLeadingTabsToSpaces);
-            AddBinding(AvaloniaEditCommands.ConvertLeadingSpacesToTabs, OnConvertLeadingSpacesToTabs);
-            AddBinding(AvaloniaEditCommands.IndentSelection, OnIndentSelection);
         }
 
         private static TextArea GetTextArea(object target)
@@ -562,217 +547,5 @@ namespace AvaloniaEdit.Editing
         }
 
         #endregion
-
-        #region Toggle Overstrike
-
-        private static void OnToggleOverstrike(object target, ExecutedRoutedEventArgs args)
-        {
-            var textArea = GetTextArea(target);
-            if (textArea != null && textArea.Options.AllowToggleOverstrikeMode)
-                textArea.OverstrikeMode = !textArea.OverstrikeMode;
-        }
-
-        #endregion
-
-        #region DeleteLine
-
-        private static void OnDeleteLine(object target, ExecutedRoutedEventArgs args)
-        {
-            var textArea = GetTextArea(target);
-            if (textArea?.Document != null)
-            {
-                int firstLineIndex, lastLineIndex;
-                if (textArea.Selection.Length == 0)
-                {
-                    // There is no selection, simply delete current line
-                    firstLineIndex = lastLineIndex = textArea.Caret.Line;
-                }
-                else
-                {
-                    // There is a selection, remove all lines affected by it (use Min/Max to be independent from selection direction)
-                    firstLineIndex = Math.Min(textArea.Selection.StartPosition.Line,
-                        textArea.Selection.EndPosition.Line);
-                    lastLineIndex = Math.Max(textArea.Selection.StartPosition.Line,
-                        textArea.Selection.EndPosition.Line);
-                }
-                var startLine = textArea.Document.GetLineByNumber(firstLineIndex);
-                var endLine = textArea.Document.GetLineByNumber(lastLineIndex);
-                textArea.Selection = Selection.Create(textArea, startLine.Offset,
-                    endLine.Offset + endLine.TotalLength);
-                textArea.RemoveSelectedText();
-                args.Handled = true;
-            }
-        }
-
-        #endregion
-
-        #region Remove..Whitespace / Convert Tabs-Spaces
-
-        private static void OnRemoveLeadingWhitespace(object target, ExecutedRoutedEventArgs args)
-        {
-            TransformSelectedLines(
-                delegate (TextArea textArea, DocumentLine line)
-                {
-                    textArea.Document.Remove(TextUtilities.GetLeadingWhitespace(textArea.Document, line));
-                }, target, args, DefaultSegmentType.WholeDocument);
-        }
-
-        private static void OnRemoveTrailingWhitespace(object target, ExecutedRoutedEventArgs args)
-        {
-            TransformSelectedLines(
-                delegate (TextArea textArea, DocumentLine line)
-                {
-                    textArea.Document.Remove(TextUtilities.GetTrailingWhitespace(textArea.Document, line));
-                }, target, args, DefaultSegmentType.WholeDocument);
-        }
-
-        private static void OnConvertTabsToSpaces(object target, ExecutedRoutedEventArgs args)
-        {
-            TransformSelectedSegments(ConvertTabsToSpaces, target, args, DefaultSegmentType.WholeDocument);
-        }
-
-        private static void OnConvertLeadingTabsToSpaces(object target, ExecutedRoutedEventArgs args)
-        {
-            TransformSelectedLines(
-                delegate (TextArea textArea, DocumentLine line)
-                {
-                    ConvertTabsToSpaces(textArea, TextUtilities.GetLeadingWhitespace(textArea.Document, line));
-                }, target, args, DefaultSegmentType.WholeDocument);
-        }
-
-        private static void ConvertTabsToSpaces(TextArea textArea, ISegment segment)
-        {
-            var document = textArea.Document;
-            var endOffset = segment.EndOffset;
-            var indentationString = new string(' ', textArea.Options.IndentationSize);
-            for (var offset = segment.Offset; offset < endOffset; offset++)
-            {
-                if (document.GetCharAt(offset) == '\t')
-                {
-                    document.Replace(offset, 1, indentationString, OffsetChangeMappingType.CharacterReplace);
-                    endOffset += indentationString.Length - 1;
-                }
-            }
-        }
-
-        private static void OnConvertSpacesToTabs(object target, ExecutedRoutedEventArgs args)
-        {
-            TransformSelectedSegments(ConvertSpacesToTabs, target, args, DefaultSegmentType.WholeDocument);
-        }
-
-        private static void OnConvertLeadingSpacesToTabs(object target, ExecutedRoutedEventArgs args)
-        {
-            TransformSelectedLines(
-                delegate (TextArea textArea, DocumentLine line)
-                {
-                    ConvertSpacesToTabs(textArea, TextUtilities.GetLeadingWhitespace(textArea.Document, line));
-                }, target, args, DefaultSegmentType.WholeDocument);
-        }
-
-        private static void ConvertSpacesToTabs(TextArea textArea, ISegment segment)
-        {
-            var document = textArea.Document;
-            var endOffset = segment.EndOffset;
-            var indentationSize = textArea.Options.IndentationSize;
-            var spacesCount = 0;
-            for (var offset = segment.Offset; offset < endOffset; offset++)
-            {
-                if (document.GetCharAt(offset) == ' ')
-                {
-                    spacesCount++;
-                    if (spacesCount == indentationSize)
-                    {
-                        document.Replace(offset - (indentationSize - 1), indentationSize, "\t",
-                            OffsetChangeMappingType.CharacterReplace);
-                        spacesCount = 0;
-                        offset -= indentationSize - 1;
-                        endOffset -= indentationSize - 1;
-                    }
-                }
-                else
-                {
-                    spacesCount = 0;
-                }
-            }
-        }
-
-        #endregion
-
-        #region Convert...Case
-
-        private static void ConvertCase(Func<string, string> transformText, object target, ExecutedRoutedEventArgs args)
-        {
-            TransformSelectedSegments(
-                delegate (TextArea textArea, ISegment segment)
-                {
-                    var oldText = textArea.Document.GetText(segment);
-                    var newText = transformText(oldText);
-                    textArea.Document.Replace(segment.Offset, segment.Length, newText,
-                        OffsetChangeMappingType.CharacterReplace);
-                }, target, args, DefaultSegmentType.WholeDocument);
-        }
-
-        private static void OnConvertToUpperCase(object target, ExecutedRoutedEventArgs args)
-        {
-            ConvertCase(CultureInfo.CurrentCulture.TextInfo.ToUpper, target, args);
-        }
-
-        private static void OnConvertToLowerCase(object target, ExecutedRoutedEventArgs args)
-        {
-            ConvertCase(CultureInfo.CurrentCulture.TextInfo.ToLower, target, args);
-        }
-
-        private static void OnConvertToTitleCase(object target, ExecutedRoutedEventArgs args)
-        {
-            throw new NotSupportedException();
-            //ConvertCase(CultureInfo.CurrentCulture.TextInfo.ToTitleCase, target, args);
-        }
-
-        private static void OnInvertCase(object target, ExecutedRoutedEventArgs args)
-        {
-            ConvertCase(InvertCase, target, args);
-        }
-
-        private static string InvertCase(string text)
-        {
-            // TODO: culture
-            //var culture = CultureInfo.CurrentCulture;
-            var buffer = text.ToCharArray();
-            for (var i = 0; i < buffer.Length; ++i)
-            {
-                var c = buffer[i];
-                buffer[i] = char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c);
-            }
-            return new string(buffer);
-        }
-
-        #endregion
-
-        private static void OnIndentSelection(object target, ExecutedRoutedEventArgs args)
-        {
-            var textArea = GetTextArea(target);
-            if (textArea?.Document != null && textArea.IndentationStrategy != null)
-            {
-                using (textArea.Document.RunUpdate())
-                {
-                    int start, end;
-                    if (textArea.Selection.IsEmpty)
-                    {
-                        start = 1;
-                        end = textArea.Document.LineCount;
-                    }
-                    else
-                    {
-                        start = textArea.Document.GetLineByOffset(textArea.Selection.SurroundingSegment.Offset)
-                            .LineNumber;
-                        end = textArea.Document.GetLineByOffset(textArea.Selection.SurroundingSegment.EndOffset)
-                            .LineNumber;
-                    }
-                    textArea.IndentationStrategy.IndentLines(textArea.Document, start, end);
-                }
-                textArea.Caret.BringCaretToView();
-                args.Handled = true;
-            }
-        }
     }
 }
